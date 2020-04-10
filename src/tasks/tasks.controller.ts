@@ -1,14 +1,29 @@
-import { Controller, Get, Post, Body, Param, Delete, Patch, Query, UsePipes, ValidationPipe, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Patch,
+  Query,
+  UsePipes,
+  ValidationPipe,
+  ParseIntPipe,
+  UseGuards,
+} from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { TaskStatusValidationPipe } from './pipes/task-status-validation.pipe';
 import { Task } from './task.entity';
 import { TaskStatus } from './task-status.enum';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('tasks')
+@UseGuards(AuthGuard())
 export class TasksController {
-  constructor(private tasksService:TasksService) {}
+  constructor(private tasksService: TasksService) {}
 
   @Get()
   getTasks(@Query(ValidationPipe) filterDto: GetTasksFilterDto) {
@@ -34,8 +49,9 @@ export class TasksController {
 
   @Patch('/:id/status')
   updateStatus(
-    @Param('id', ParseIntPipe) id: number, 
-    @Body('status', TaskStatusValidationPipe) status: TaskStatus) {
+    @Param('id', ParseIntPipe) id: number,
+    @Body('status', TaskStatusValidationPipe) status: TaskStatus,
+  ) {
     return this.tasksService.updateStatus(id, status);
   }
 }
